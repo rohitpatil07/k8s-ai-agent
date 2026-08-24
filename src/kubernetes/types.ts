@@ -88,3 +88,10 @@ export interface Diagnosis {
   evidence: string[];
   recommendation: string;
 }
+
+export interface AIContext {
+  pod: PodDetail;
+  events: PodEvent[];
+  logs: PodLogs;
+  diagnosis: Diagnosis;
+}
