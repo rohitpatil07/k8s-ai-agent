@@ -18,6 +18,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^2.0.0"
+    "@kubernetes/client-node": "^2.0.0",
+    "openai": "^7.5.0"
   }
 }
