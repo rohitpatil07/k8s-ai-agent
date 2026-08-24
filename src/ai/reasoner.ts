@@ -27,7 +27,8 @@ export async function reason(
     ],
     temperature: 0.2,
     top_p: 0.95,
-    max_tokens: 2048,
+    max_tokens: 512,
+    reasoning_effort: "low",
     stream: false,
   });
 
