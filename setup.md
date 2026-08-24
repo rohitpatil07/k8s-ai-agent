@@ -124,3 +124,93 @@ export async function getPods(namespace: string) {
   }));
 }
 ```
+
+#Run a sample failure pod
+```
+kubectl run failurepod \
+  --image=someimage \
+  --restart=Never
+```
+
+# Run OOM test pod
+```
+kubectl run oompod \
+  --image=busybox \
+  --restart=Never \
+  --overrides='
+{
+  "spec": {
+    "containers": [{
+      "name": "oompod",
+      "image": "busybox",
+      "command": ["sh", "-c", "dd if=/dev/zero of=/dev/shm/test bs=1M count=50"],
+      "resources": {
+        "limits": {
+          "memory": "10Mi"
+        }
+      }
+    }]
+  }
+}'
+```
+
+# Run pending pod test
+```
+kubectl run pendingpod \
+  --image=busybox \
+  --restart=Never \
+  --overrides='
+{
+  "spec": {
+    "containers": [{
+      "name": "pendingpod",
+      "image": "busybox",
+      "resources": {
+        "requests": {
+          "cpu": "1000"
+        }
+      }
+    }]
+  }
+}'
+```
+
+# Pending PVC
+## create pvc
+```
+kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: failing-pvc
+spec:
+  storageClassName: does-not-exist
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+EOF
+```
+
+## create pod with that pvc
+```
+kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvcpod
+spec:
+  containers:
+    - name: pvcpod
+      image: busybox
+      command: ["sleep", "3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: failing-pvc
+EOF
+```

@@ -4,8 +4,8 @@ import { getPodLogs } from "./kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
 
 const namespace = "default";
-const podName = "ai-agent-crash-test-84dd8779cd-tdwq7";
-const containerName = "busybox";
+const podName = "exitpod";
+const containerName = "exitpod";
 
 async function main() {
   const pod = await getPod(
@@ -23,7 +23,7 @@ async function main() {
     podName,
     containerName,
     100,
-    true,
+    false,
   );
 
   const diagnosis = diagnose({

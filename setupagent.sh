@@ -72,5 +72,3 @@ echo "console.log('Hello, Kubernetes AI Agent!');" > src/index.ts
 #Build and test initial setup
 npm i -y && npm run build && npm start
 
-
-
