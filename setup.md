@@ -1,6 +1,10 @@
 # Set up API key
 Go to the OpenAI API platform and sign in: [OpenAI API Platform](https://platform.openai.com/?utm_source=chatgpt.com). You can create an API key from the API key section.
 
+```
+export NVIDIA_API_KEY=<API_KEY>
+``` 
+
 # Install Node
 ```
 sudo apt update
