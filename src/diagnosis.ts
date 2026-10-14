@@ -15,7 +15,8 @@ export function diagnose(
     container =>
       container.state?.reason === "CrashLoopBackOff" ||
       container.state?.reason === "Error" ||
-      container.state?.type === "terminated",
+      container.state?.type === "terminated" ||
+      container.lastState?.type === "terminated",
   );
 
   
