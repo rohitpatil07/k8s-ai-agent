@@ -8,71 +8,75 @@ n 24
 
 # install k3s
 curl -sfL https://get.k3s.io | sh -
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 
 #Set up the project directory
-mkdir k8s-ai-agent
-cd k8s-ai-agent
+# mkdir k8s-ai-agent
+# cd k8s-ai-agent
 
 #Uses existing packages to Create a pckage.json file
-echo "Creating package.json file..."
+# echo "Creating package.json file..."
 
-cat << EOF > package.json
-{
-  "name": "k8s-ai-agent",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "devDependencies": {
-    "@types/node": "^26.2.0",
-    "tsx": "^4.23.12",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "@kubernetes/client-node": "^2.0.0"
-  }
-}
-EOF
+# cat << EOF > package.json
+# {
+#   "name": "k8s-ai-agent",
+#   "version": "1.0.0",
+#   "description": "",
+#   "main": "index.js",
+#   "scripts": {
+#     "dev": "tsx src/index.ts",
+#     "build": "tsc",
+#     "start": "node dist/index.js"
+#   },
+#   "keywords": [],
+#   "author": "",
+#   "license": "ISC",
+#   "type": "module",
+#   "devDependencies": {
+#     "@types/node": "^26.2.0",
+#     "tsx": "^4.23.12",
+#     "typescript": "^7.0.2"
+#   },
+#   "dependencies": {
+#     "@kubernetes/client-node": "^2.0.0"
+#   }
+# }
+# EOF
 
-echo "Creating tsconfig.json file..."
-cat << EOF > tsconfig.json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "rootDir": "./src",
-    "outDir": "./dist",
+# echo "Creating tsconfig.json file..."
+# cat << EOF > tsconfig.json
+# {
+#   "compilerOptions": {
+#     "target": "ES2022",
+#     "module": "NodeNext",
+#     "moduleResolution": "NodeNext",
+#     "rootDir": "./src",
+#     "outDir": "./dist",
 
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
+#     "strict": true,
+#     "esModuleInterop": true,
+#     "skipLibCheck": true,
 
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src"]
-}
-EOF
+#     "forceConsistentCasingInFileNames": true
+#   },
+#   "include": ["src"]
+# }
+# EOF
 
 #Set up the source directory structure
-mkdir -p src
-mkdir -p src/kubernetes
+# mkdir -p src
+# mkdir -p src/kubernetes
 
-touch src/index.ts
+# touch src/index.ts
 
-echo "console.log('Hello, Kubernetes AI Agent!');" > src/index.ts
+# echo "console.log('Hello, Kubernetes AI Agent!');" > src/index.ts
 
+# clone repo 
+git clone https://github.com/rohitpatil07/k8s-ai-agent.git
 
 #Build and test initial setup
+cd k8s-ai-agent
 npm i -y && npm run build && npm start
 
 
