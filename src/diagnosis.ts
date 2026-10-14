@@ -14,6 +14,11 @@ export function diagnose(
   const failingContainers = pod.containers.filter(
     container =>
       container.state?.reason === "CrashLoopBackOff" ||
+      container.state?.reason === "ImagePullBackOff" ||
+      container.state?.reason === "ErrImagePull" ||
+      container.state?.reason === "InvalidImageName" ||
+      container.state?.reason === "CreateContainerConfigError" ||
+      container.state?.reason === "CreateContainerError" ||
       container.state?.reason === "Error" ||
       container.state?.type === "terminated" ||
       container.lastState?.type === "terminated",
