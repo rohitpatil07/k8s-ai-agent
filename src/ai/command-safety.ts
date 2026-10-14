@@ -81,7 +81,7 @@ export function validateDiagnosticCommand(
     };
   }
 
-  if (parts[1] === "get" || parts[1] === "describe" || parts[1] === "top" || parts[1] === "logs") {
+  if (parts[1] === "get" || parts[1] === "describe" || parts[1] === "top" ) {
     const resource = parts[2];
 
     if (!resource || !ALLOWED_RESOURCES.has(resource)) {
