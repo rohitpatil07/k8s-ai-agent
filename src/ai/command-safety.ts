@@ -41,7 +41,9 @@ const BLOCKED_PATTERNS = [
   /\r/,
   /\$\{/,
   /&/,
-  /\\/
+  /\\/,
+  /--raw(?:=|\s|$)/i,
+  /--follow\b/i,
 ];
 
 export function validateDiagnosticCommand(
