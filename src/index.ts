@@ -5,6 +5,8 @@ import { getPodLogs } from "./kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
 import { askAI, parseAIAnalysis } from "./ai/openrouter.js";
 import { buildDiagnosisPrompt } from "./ai/prompts.js";
+import { validateDiagnosticCommand } from "./ai/command-safety.js";
+import { AIAnalysis } from "./ai/types.js"
 
 const namespace = process.argv[2] ?? "default";
 const podName = process.argv[3] ?? "nginx";
@@ -32,7 +34,7 @@ async function main() {
 
   // Layer 2: AI review based on the diagnosis evidence.
   
-  let aiAnalysis: import("./ai/types.js").AIAnalysis | null = null;
+  let aiAnalysis: AIAnalysis | null = null;
 
   try {
     const prompt = buildDiagnosisPrompt(
@@ -47,7 +49,25 @@ async function main() {
     );
 
     const rawResponse = await askAI(prompt);
-    aiAnalysis = parseAIAnalysis(rawResponse);
+
+    const parsedAnalysis = parseAIAnalysis(rawResponse);
+
+    aiAnalysis = {
+      ...parsedAnalysis,
+      nextChecks: parsedAnalysis.nextChecks.filter(check => {
+        const result = validateDiagnosticCommand(check.command);
+
+        if (!result.safe) {
+          console.warn(
+            `Blocked AI-recommended command: ${check.command}`,
+            `Reason: ${result.reason}`,
+          );
+        }
+
+        return result.safe;
+      }),
+    };
+
   } catch (error) {
     console.error("AI review failed:", error);
   }
