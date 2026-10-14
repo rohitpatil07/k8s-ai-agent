@@ -44,6 +44,8 @@ const BLOCKED_PATTERNS = [
   /\\/,
   /--raw(?:=|\s|$)/i,
   /--follow\b/i,
+  /--watch(?:=|\s|$)/i,
+  /-w\b/
 ];
 
 export function validateDiagnosticCommand(
