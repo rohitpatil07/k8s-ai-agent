@@ -107,7 +107,9 @@ export function diagnose(
 
   if (crashLoopContainer) {
     summary =
-      `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`;
+      crashLoopContainer.state?.reason === "CrashLoopBackOff" || backOffEvents.length > 0
+        ? `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`
+        : `Container ${crashLoopContainer.name} has terminated unexpectedly.`;
 
     if (
       logs.logs &&
