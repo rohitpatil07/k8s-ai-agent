@@ -3,9 +3,9 @@ import { getPodEvents } from "./kubernetes/events.js";
 import { getPodLogs } from "./kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
 
-const namespace = "default";
-const podName = "nginx";
-const containerName = "nginx";
+const namespace = process.argv[2] ?? "default";
+const podName = process.argv[3] ?? "nginx";
+const containerName = process.argv[4];
 
 async function main() {
   const pod = await getPod(
