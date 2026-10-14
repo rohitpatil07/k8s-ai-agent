@@ -6,6 +6,9 @@ npm cache clean -f
 npm install -g n
 n 24
 
+# install k3s
+curl -sfL https://get.k3s.io | sh -
+
 
 #Set up the project directory
 mkdir k8s-ai-agent
