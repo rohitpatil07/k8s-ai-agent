@@ -18,14 +18,26 @@ export function diagnose(
       container.state?.type === "terminated",
   );
 
+  
   for (const container of failingContainers) {
     evidence.push(
       `Container ${container.name} is unhealthy: ` +
       `state=${container.state?.type}, ` +
       `reason=${container.state?.reason ?? "unknown"}, ` +
+      `exitCode=${container.state?.exitCode ?? "unknown"}, ` +
       `restartCount=${container.restartCount}.`,
     );
+
+    if (container.lastState) {
+      evidence.push(
+        `Previous termination for ${container.name}: ` +
+        `state=${container.lastState.type}, ` +
+        `reason=${container.lastState.reason ?? "unknown"}, ` +
+        `exitCode=${container.lastState.exitCode ?? "unknown"}.`,
+      );
+    }
   }
+
 
   // Look for Kubernetes restart/backoff events.
   const backOffEvents = events.filter(
