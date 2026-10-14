@@ -8,7 +8,11 @@ n 24
 
 # install k3s
 curl -sfL https://get.k3s.io | sh -
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml 
+
+# export alias
+export k=kubectl
+export syncrepo="git pull && npm run dev"
 
 
 #Set up the project directory
