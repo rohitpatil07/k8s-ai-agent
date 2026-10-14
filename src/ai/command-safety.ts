@@ -88,9 +88,16 @@ export function validateDiagnosticCommand(
         return {
             safe: false,
             reason: "Resource type is missing or not in the diagnostic allowlist.",
-            };
-        }
+        };
     }
+  }
+
+  if (parts[1] === "logs" && !parts[2]) {
+    return {
+        safe: false,
+        reason: "kubectl logs requires a pod name.",
+    };
+  }
 
   return {
     safe: true,
