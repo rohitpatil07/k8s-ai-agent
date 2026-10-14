@@ -11,8 +11,8 @@ curl -sfL https://get.k3s.io | sh -
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml 
 
 # export alias
-export k=kubectl
-export syncrepo="git pull && npm run dev"
+alias k=kubectl
+alias syncrepo="git pull && npm run dev"
 
 # ai
 export OPENROUTER_MODEL="nvidia/nemotron-3.5-lightning:free"
