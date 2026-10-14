@@ -84,7 +84,12 @@ export function diagnose(
 
   const crashLoopContainer = pod.containers.find(
     container =>
-      container.state?.reason === "CrashLoopBackOff",
+      container.state?.reason === "CrashLoopBackOff" ||
+      container.state?.type === "terminated",
+  ) ?? (
+    backOffEvents.length > 0
+      ? failingContainers[0]
+      : undefined
   );
 
   if (crashLoopContainer) {
