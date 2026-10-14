@@ -44,12 +44,37 @@ export function diagnose(
   // particularly important for CrashLoopBackOff.
   if (logs.logs) {
     evidence.push(
-      `Previous container logs:\n${logs.logs.trim()}`,
+      `Container logs:\n${logs.logs.trim()}`,
     );
   } else if (logs.reason === "NO_PREVIOUS_CONTAINER") {
     evidence.push(
       "No previous container logs are available.",
     );
+  }
+
+  // A running pod with all containers ready and no
+  // failure or backoff signals is considered healthy.
+  const allContainersReady =
+    pod.containers.length > 0 &&
+    pod.containers.every(container => container.ready);
+
+  if (
+    pod.phase === "Running" &&
+    allContainersReady &&
+    failingContainers.length === 0 &&
+    backOffEvents.length === 0
+  ) {
+    evidence.push(
+      "Pod is Running, all containers are ready, and no container failure or backoff signals were detected.",
+    );
+
+    return {
+      summary: `Pod ${pod.name} is healthy.`,
+      rootCause: "No failure detected in the collected evidence.",
+      evidence,
+      recommendation:
+        "No action required. Continue monitoring the pod.",
+    };
   }
 
   let summary = `Pod ${pod.name} requires investigation.`;
