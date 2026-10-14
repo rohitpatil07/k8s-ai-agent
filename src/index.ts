@@ -4,8 +4,8 @@ import { getPodLogs } from "./kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
 
 const namespace = "default";
-const podName = "ai-agent-crash-test-84dd8779cd-tdwq7";
-const containerName = "busybox";
+const podName = "nginx";
+const containerName = "nginx";
 
 async function main() {
   const pod = await getPod(
