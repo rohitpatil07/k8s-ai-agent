@@ -24,6 +24,11 @@ const BLOCKED_PATTERNS = [
   /\bexec\b/i,
   /\battach\b/i,
   /\bport-forward\b/i,
+  /\n/,
+  /\r/,
+  /\$\{/,
+  /&/,
+  /\\/
 ];
 
 export function validateDiagnosticCommand(
