@@ -3,7 +3,7 @@ import { getPod } from "./kubernetes/pod.js";
 import { getPodEvents } from "./kubernetes/events.js";
 import { getPodLogs } from "./kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
-import { askAI } from "./ai/openrouter.js";
+import { askAI, parseAIAnalysis } from "./ai/openrouter.js";
 import { buildDiagnosisPrompt } from "./ai/prompts.js";
 
 const namespace = process.argv[2] ?? "default";
@@ -31,7 +31,8 @@ async function main() {
   });
 
   // Layer 2: AI review based on the diagnosis evidence.
-  let aiAnalysis: string;
+  
+  let aiAnalysis: import("./ai/types.js").AIAnalysis | null = null;
 
   try {
     const prompt = buildDiagnosisPrompt(
@@ -45,13 +46,12 @@ async function main() {
       },
     );
 
-    aiAnalysis = await askAI(prompt);
+    const rawResponse = await askAI(prompt);
+    aiAnalysis = parseAIAnalysis(rawResponse);
   } catch (error) {
-    aiAnalysis =
-      "AI analysis unavailable. See the rule-based diagnosis.";
-
     console.error("AI review failed:", error);
   }
+
 
   console.dir(
     {
