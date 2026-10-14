@@ -14,6 +14,9 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 export k=kubectl
 export syncrepo="git pull && npm run dev"
 
+# ai
+export OPENROUTER_MODEL="nvidia/nemotron-3.5-lightning:free"
+export OPENROUTER_API_KEY=
 
 #Set up the project directory
 # mkdir k8s-ai-agent
