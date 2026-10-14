@@ -38,6 +38,11 @@ async function main() {
       pod.name,
       namespace,
       diagnosis,
+      {
+        pod,
+        events,
+        logs,
+      },
     );
 
     aiAnalysis = await askAI(prompt);
