@@ -95,6 +95,35 @@ export function diagnose(
     };
   }
 
+  const imagePullContainer = pod.containers.find(
+    container =>
+      container.state?.reason === "ImagePullBackOff" ||
+      container.state?.reason === "ErrImagePull" ||
+      container.state?.reason === "InvalidImageName",
+  );
+
+  if (imagePullContainer) {
+    const reason = imagePullContainer.state?.reason;
+    const message = imagePullContainer.state?.message;
+
+    evidence.push(
+      `Image-pull failure for container ${imagePullContainer.name}: ` +
+      `reason=${reason}, ` +
+      `message=${message ?? "No detailed message available"}.`,
+    );
+
+    return {
+      summary: `Container ${imagePullContainer.name} cannot pull its image.`,
+      rootCause:
+        message ??
+        `Kubernetes reported ${reason}, indicating that the container image could not be retrieved or resolved.`,
+      evidence,
+      recommendation:
+        "Verify the image name and tag, registry availability, and image-pull credentials. Check pod events for the exact registry error.",
+    };
+  }
+
+
   let summary = `Pod ${pod.name} requires investigation.`;
   let rootCause = "Unable to determine the root cause.";
   let recommendation =
