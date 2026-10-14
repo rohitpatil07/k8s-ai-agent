@@ -23,7 +23,7 @@ async function main() {
     podName,
     containerName,
     100,
-    true,
+    false,
   );
 
   const diagnosis = diagnose({
