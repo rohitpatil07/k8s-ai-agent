@@ -79,7 +79,7 @@ export function validateDiagnosticCommand(
     };
   }
 
-  if (parts[1] === "get" || parts[1] === "describe" || parts[1] === "top") {
+  if (parts[1] === "get" || parts[1] === "describe" || parts[1] === "top" || parts[1] === "logs") {
     const resource = parts[2];
 
     if (!resource || !ALLOWED_RESOURCES.has(resource)) {
