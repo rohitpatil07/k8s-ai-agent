@@ -18,6 +18,53 @@ const ALLOWED_RESOURCES = new Set([
   "namespace",
 ]);
 
+
+const ALLOWED_FLAGS: Record<string, Set<string>> = {
+  get: new Set([
+    "-n", "--namespace",
+    "-o", "--output",
+    "-l", "--selector",
+    "--show-labels",
+    "--sort-by",
+    "--field-selector",
+  ]),
+  describe: new Set([
+    "-n", "--namespace",
+  ]),
+  logs: new Set([
+    "-n", "--namespace",
+    "-c", "--container",
+    "--previous", "-p",
+    "--tail",
+    "--since",
+    "--timestamps",
+    "--all-containers",
+    "--prefix",
+  ]),
+  top: new Set([
+    "-n", "--namespace",
+  ]),
+};
+
+const FLAGS_WITH_VALUES = new Set([
+  "-n", "--namespace",
+  "-o", "--output",
+  "-l", "--selector",
+  "--sort-by",
+  "--field-selector",
+  "-c", "--container",
+  "--tail",
+  "--since",
+]);
+
+const ALLOWED_OUTPUT_FORMATS = new Set([
+  "wide",
+  "json",
+  "yaml",
+  "name",
+]);
+
+
 const BLOCKED_PATTERNS = [
   /;/,
   /&&/,
