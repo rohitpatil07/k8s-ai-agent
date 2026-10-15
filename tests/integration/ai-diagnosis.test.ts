@@ -8,6 +8,7 @@ interface Scenario {
   name: string;
   evidence: CollectedEvidence;
   expected: RegExp[];
+  expectedCheck?: boolean;
 }
 
 const scenarios: Scenario[] = [
@@ -71,6 +72,7 @@ const scenarios: Scenario[] = [
       /cpu/i,
       /schedul|pending|node/i,
     ],
+    expectedCheck: true,
   },
   {
     name: "CrashLoopBackOff",
@@ -150,7 +152,8 @@ describe.skipIf(!process.env.OPENROUTER_API_KEY)(
   () => {
     it.each(scenarios)(
       "$name",
-      async ({ evidence, expected }) => {
+      async ({ scenario }) => {
+         const { evidence, expected } = scenario;
         const prompt = buildDiagnosisPrompt(
           evidence.pod.name,
           evidence.pod.namespace,
@@ -191,6 +194,29 @@ describe.skipIf(!process.env.OPENROUTER_API_KEY)(
 
         for (const pattern of expected) {
           expect(diagnosticText).toMatch(pattern);
+        }
+
+        if (scenario.expectedCheck) {
+          const hasUsefulResourceCheck = analysis.nextChecks.some(
+            ({ command, reason }) =>
+              (
+                /kubectl describe pod/i.test(command) &&
+                /request|schedul|cpu/i.test(reason)
+              ) ||
+              (
+                /kubectl describe nodes/i.test(command) &&
+                /allocatable|capacity|cpu/i.test(reason)
+              ) ||
+              (
+                /kubectl top nodes/i.test(command) &&
+                /usage|utilization|metrics/i.test(reason)
+              ),
+          );
+
+          expect(
+            hasUsefulResourceCheck,
+            "Expected a command that meaningfully investigates scheduling resources",
+          ).toBe(true);
         }
 
         // Every suggested check should include a command and rationale.
