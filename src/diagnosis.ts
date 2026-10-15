@@ -43,6 +43,21 @@ export function diagnose(
     }
   }
 
+  // Preserve previous termination details for recovered containers.
+  for (const container of pod.containers) {
+    if (
+      !failingContainers.includes(container) &&
+      container.lastState?.type === "terminated"
+    ) {
+      evidence.push(
+        `Historical termination for ${container.name}: ` +
+        `reason=${container.lastState.reason ?? "unknown"}, ` +
+        `exitCode=${container.lastState.exitCode ?? "unknown"}, ` +
+        `restartCount=${container.restartCount}.`,
+      );
+    }
+  }
+
 
   // Look for Kubernetes restart/backoff events.
   const backOffEvents = events.filter(
