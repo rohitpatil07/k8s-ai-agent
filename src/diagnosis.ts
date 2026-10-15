@@ -84,6 +84,31 @@ export function diagnose(
     );
   }
 
+    // Recognize workloads that completed successfully.
+  const completedSuccessfully =
+    pod.phase === "Succeeded" &&
+    pod.containers.length > 0 &&
+    pod.containers.every(
+      container =>
+        container.state?.type === "terminated" &&
+        container.state.reason === "Completed" &&
+        container.state.exitCode === 0,
+    );
+
+  if (completedSuccessfully) {
+    evidence.push(
+      "Pod completed successfully: all containers terminated with reason Completed and exit code 0.",
+    );
+
+    return {
+      summary: `Pod ${pod.name} completed successfully.`,
+      rootCause: "The workload completed normally with exit code 0.",
+      evidence,
+      recommendation:
+        "No corrective action required. Verify the Job's expected output if needed.",
+    };
+  }
+
   // A running pod with all containers ready and no
   // failure or backoff signals is considered healthy.
   const allContainersReady =
