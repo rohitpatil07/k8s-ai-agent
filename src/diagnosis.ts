@@ -109,6 +109,53 @@ export function diagnose(
     };
   }
 
+    // Diagnose pods that cannot be scheduled onto a node.
+  const schedulingEvents = events.filter(
+    event => event.reason === "FailedScheduling",
+  );
+
+  for (const event of schedulingEvents) {
+    evidence.push(`Scheduling event: ${event.message}`);
+  }
+
+  if (schedulingEvents.length > 0) {
+    const schedulingMessage = schedulingEvents
+      .map(event => event.message)
+      .join(" ");
+
+    let rootCause: string;
+    let recommendation: string;
+
+    if (/insufficient cpu/i.test(schedulingMessage)) {
+      rootCause =
+        "The Kubernetes scheduler cannot place this pod because " +
+        "the available CPU resources are insufficient for its scheduling requirements.";
+
+      recommendation =
+        "Review the pod's CPU requests and the node's available allocatable CPU. Check whether workload requests can be right-sized or additional cluster capacity is needed.";
+    } else if (/insufficient memory/i.test(schedulingMessage)) {
+      rootCause =
+        "The Kubernetes scheduler cannot place this pod because " +
+        "the available memory is insufficient for its scheduling requirements.";
+
+      recommendation =
+        "Review the pod's memory requests and the node's available allocatable memory. Check whether workload requests can be right-sized or additional cluster capacity is needed.";
+    } else {
+      rootCause =
+        `The Kubernetes scheduler could not place the pod: ${schedulingMessage}`;
+
+      recommendation =
+        "Review the scheduling event and check node capacity, taints and tolerations, node selectors, affinity rules, and other scheduling constraints as applicable.";
+    }
+
+    return {
+      summary: `Pod ${pod.name} cannot be scheduled.`,
+      rootCause,
+      evidence,
+      recommendation,
+    };
+  }
+
   // A running pod with all containers ready and no
   // failure or backoff signals is considered healthy.
   const allContainersReady =
