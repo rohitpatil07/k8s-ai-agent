@@ -1,8 +1,7 @@
-import { askAI, parseAIAnalysis } from "../../ai/openrouter.js";
-import { buildDiagnosisPrompt } from "../../ai/prompts.js";
-import { validateDiagnosticCommand } from "../../ai/command-safety.js";
-import { CollectedEvidence } from "../../ai/types.js";
-import { Scenario }  from "../types.js" 
+import { askAI, parseAIAnalysis } from "../../src/ai/openrouter.js";
+import { buildDiagnosisPrompt } from "../../src/ai/prompts.js";
+import { validateDiagnosticCommand } from "../../src/ai/command-safety.js";
+import type { Scenario } from "../types.js";
 
 const scenarios: Scenario[] = [
   {
