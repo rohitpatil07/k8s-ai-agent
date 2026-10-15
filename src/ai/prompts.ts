@@ -52,6 +52,11 @@ INVESTIGATION GUIDELINES
     ready containers, no observed failure signals, and successful
     startup logs can support a confident assessment of its observed
     health, even if external connectivity has not been tested.
+12. Do not invent resource names, label selectors, Service names,
+    hostnames, namespaces, or ports. Use identifiers explicitly
+    present in the supplied evidence. If an identifier is unknown,
+    recommend a suitable discovery command without assuming its
+    value.
 
 POD
 Name: ${podName}
