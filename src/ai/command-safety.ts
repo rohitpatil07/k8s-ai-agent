@@ -45,7 +45,16 @@ const BLOCKED_PATTERNS = [
   /--raw(?:=|\s|$)/i,
   /--follow\b/i,
   /--watch(?:=|\s|$)/i,
-  /-w\b/
+  /-w\b/,
+  /--as(?:=|\s|$)/i,
+  /--as-group(?:=|\s|$)/i,
+  /--token(?:=|\s|$)/i,
+  /--server(?:=|\s|$)/i,
+  /--kubeconfig(?:=|\s|$)/i,
+  /--context(?:=|\s|$)/i,
+  /--certificate-authority(?:=|\s|$)/i,
+  /--client-certificate(?:=|\s|$)/i,
+  /--client-key(?:=|\s|$)/i,
 ];
 
 export function validateDiagnosticCommand(
