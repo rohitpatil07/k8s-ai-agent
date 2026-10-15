@@ -158,7 +158,18 @@ describe.skipIf(!process.env.OPENROUTER_API_KEY)(
         );
 
         const rawResponse = await askAI(prompt);
-        const analysis = parseAIAnalysis(rawResponse);
+
+        let analysis: ReturnType<typeof parseAIAnalysis>;
+
+        try {
+          analysis = parseAIAnalysis(rawResponse);
+        } catch (error) {
+          console.error(
+            `Invalid AI response for scenario "${evidence.pod.name}":`,
+          );
+          console.error(rawResponse);
+          throw error;
+        }
 
         // Verify the structured response contains usable results.
         expect(analysis.assessment.trim()).not.toBe("");
