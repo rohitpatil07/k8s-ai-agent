@@ -20,8 +20,7 @@ export function diagnose(
       container.state?.reason === "CreateContainerConfigError" ||
       container.state?.reason === "CreateContainerError" ||
       container.state?.reason === "Error" ||
-      container.state?.type === "terminated" ||
-      container.lastState?.type === "terminated",
+      ( container.state?.type === "terminated" && (container.state.reason !== "Completed" || container.state.exitCode !== 0) )
   );
 
   
@@ -40,6 +39,21 @@ export function diagnose(
         `state=${container.lastState.type}, ` +
         `reason=${container.lastState.reason ?? "unknown"}, ` +
         `exitCode=${container.lastState.exitCode ?? "unknown"}.`,
+      );
+    }
+  }
+
+  // Preserve previous termination details for recovered containers.
+  for (const container of pod.containers) {
+    if (
+      !failingContainers.includes(container) &&
+      container.lastState?.type === "terminated"
+    ) {
+      evidence.push(
+        `Historical termination for ${container.name}: ` +
+        `reason=${container.lastState.reason ?? "unknown"}, ` +
+        `exitCode=${container.lastState.exitCode ?? "unknown"}, ` +
+        `restartCount=${container.restartCount}.`,
       );
     }
   }
@@ -68,6 +82,78 @@ export function diagnose(
     evidence.push(
       "No previous container logs are available.",
     );
+  }
+
+    // Recognize workloads that completed successfully.
+  const completedSuccessfully =
+    pod.phase === "Succeeded" &&
+    pod.containers.length > 0 &&
+    pod.containers.every(
+      container =>
+        container.state?.type === "terminated" &&
+        container.state.reason === "Completed" &&
+        container.state.exitCode === 0,
+    );
+
+  if (completedSuccessfully) {
+    evidence.push(
+      "Pod completed successfully: all containers terminated with reason Completed and exit code 0.",
+    );
+
+    return {
+      summary: `Pod ${pod.name} completed successfully.`,
+      rootCause: "The workload completed normally with exit code 0.",
+      evidence,
+      recommendation:
+        "No corrective action required. Verify the Job's expected output if needed.",
+    };
+  }
+
+    // Diagnose pods that cannot be scheduled onto a node.
+  const schedulingEvents = events.filter(
+    event => event.reason === "FailedScheduling",
+  );
+
+  for (const event of schedulingEvents) {
+    evidence.push(`Scheduling event: ${event.message}`);
+  }
+
+  if (schedulingEvents.length > 0) {
+    const schedulingMessage = schedulingEvents
+      .map(event => event.message)
+      .join(" ");
+
+    let rootCause: string;
+    let recommendation: string;
+
+    if (/insufficient cpu/i.test(schedulingMessage)) {
+      rootCause =
+        "The Kubernetes scheduler cannot place this pod because " +
+        "the available CPU resources are insufficient for its scheduling requirements.";
+
+      recommendation =
+        "Review the pod's CPU requests and the node's available allocatable CPU. Check whether workload requests can be right-sized or additional cluster capacity is needed.";
+    } else if (/insufficient memory/i.test(schedulingMessage)) {
+      rootCause =
+        "The Kubernetes scheduler cannot place this pod because " +
+        "the available memory is insufficient for its scheduling requirements.";
+
+      recommendation =
+        "Review the pod's memory requests and the node's available allocatable memory. Check whether workload requests can be right-sized or additional cluster capacity is needed.";
+    } else {
+      rootCause =
+        `The Kubernetes scheduler could not place the pod: ${schedulingMessage}`;
+
+      recommendation =
+        "Review the scheduling event and check node capacity, taints and tolerations, node selectors, affinity rules, and other scheduling constraints as applicable.";
+    }
+
+    return {
+      summary: `Pod ${pod.name} cannot be scheduled.`,
+      rootCause,
+      evidence,
+      recommendation,
+    };
   }
 
   // A running pod with all containers ready and no
@@ -123,6 +209,36 @@ export function diagnose(
     };
   }
 
+  
+  const configErrorContainer = pod.containers.find(
+    container =>
+      container.state?.reason === "CreateContainerConfigError" ||
+      container.state?.reason === "CreateContainerError",
+  );
+
+  if (configErrorContainer) {
+    const reason = configErrorContainer.state?.reason;
+    const message = configErrorContainer.state?.message;
+
+    evidence.push(
+      `Container configuration failure for ${configErrorContainer.name}: ` +
+      `reason=${reason}, ` +
+      `message=${message ?? "No detailed message available"}.`,
+    );
+
+    return {
+      summary:
+        `Container ${configErrorContainer.name} cannot be created because of a configuration error.`,
+      rootCause:
+        message ??
+        `Kubernetes reported ${reason}, but the detailed cause was not available.`,
+      evidence,
+      recommendation:
+        "Inspect the pod description and recent events. Verify referenced ConfigMaps, Secrets, environment variables, volumes, and other container configuration.",
+    };
+  }
+
+
 
   let summary = `Pod ${pod.name} requires investigation.`;
   let rootCause = "Unable to determine the root cause.";
@@ -139,33 +255,52 @@ export function diagnose(
       : undefined
   );
 
-  if (crashLoopContainer) {
-    summary =
-      crashLoopContainer.state?.reason === "CrashLoopBackOff" || backOffEvents.length > 0
-        ? `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`
-        : `Container ${crashLoopContainer.name} has terminated unexpectedly.`;
+    if (crashLoopContainer) {
+    const isCrashLoop =
+      crashLoopContainer.state?.reason === "CrashLoopBackOff" ||
+      backOffEvents.length > 0;
 
-    if (
-      logs.logs &&
-      logs.logs.toLowerCase().includes("crashed")
-    ) {
-      rootCause =
-        `The ${crashLoopContainer.name} container is repeatedly ` +
-        `crashing. The previous container logs indicate that the ` +
-        `application itself crashed, causing Kubernetes to restart it.`;
+    const terminationReason =
+      crashLoopContainer.state?.reason ?? "unknown";
 
-      recommendation =
-        "Inspect the application error immediately before the crash " +
-        "and check the container exit code to determine why the " +
-        "application is terminating.";
+    const exitCode =
+      crashLoopContainer.state?.exitCode ?? "unknown";
+
+    if (isCrashLoop) {
+      summary =
+        `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`;
+
+      if (
+        logs.logs &&
+        logs.logs.toLowerCase().includes("crashed")
+      ) {
+        rootCause =
+          `The ${crashLoopContainer.name} container is repeatedly ` +
+          `crashing. The logs indicate that the application crashed.`;
+
+        recommendation =
+          "Inspect the application error immediately before the crash and check the container exit code.";
+      } else {
+        rootCause =
+          `Kubernetes has reported a restart/backoff signal for ` +
+          `${crashLoopContainer.name}. The available evidence indicates ` +
+          `a container restart problem.`;
+
+        recommendation =
+          "Inspect the previous container logs, termination details, and Kubernetes events to identify the cause.";
+      }
     } else {
-      rootCause =
-        `The ${crashLoopContainer.name} container is repeatedly ` +
-        `terminating and Kubernetes is backing off before restarting it.`;
+      summary =
+        `Container ${crashLoopContainer.name} terminated with an error.`;
+
+      rootCause = logs.logs
+        ? `The container terminated with reason ${terminationReason} ` +
+          `and exit code ${exitCode}. Available logs: ${logs.logs.trim()}`
+        : `The container terminated with reason ${terminationReason} ` +
+          `and exit code ${exitCode}. No container logs are available.`;
 
       recommendation =
-        "Inspect the previous container logs and termination details " +
-        "to determine why the container is exiting.";
+        "Inspect the application logs and exit code to identify why the workload failed. For a Job, also review its status and retry settings.";
     }
   }
 

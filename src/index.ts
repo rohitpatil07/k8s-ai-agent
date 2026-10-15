@@ -6,13 +6,24 @@ import { diagnose } from "./diagnosis.js";
 import { askAI, parseAIAnalysis } from "./ai/openrouter.js";
 import { buildDiagnosisPrompt } from "./ai/prompts.js";
 import { validateDiagnosticCommand } from "./ai/command-safety.js";
-import { AIAnalysis } from "./ai/types.js"
+import type { AIAnalysis } from "./ai/types.js";
 
 const namespace = process.argv[2] ?? "default";
 const podName = process.argv[3] ?? "nginx";
 const containerName = process.argv[4];
 
+type DiagnosticResult =
+  | {
+      source: "ai";
+      analysis: AIAnalysis;
+    }
+  | {
+      source: "deterministic-fallback";
+      diagnosis: ReturnType<typeof diagnose>;
+    };
+
 async function main() {
+  // Collect facts from Kubernetes.
   const pod = await getPod(namespace, podName);
 
   const events = await getPodEvents(namespace, podName);
@@ -25,22 +36,13 @@ async function main() {
     false,
   );
 
-  // Layer 1: Existing rule-based diagnosis.
-  const diagnosis = diagnose({
-    pod,
-    events,
-    logs,
-  });
-
-  // Layer 2: AI review based on the diagnosis evidence.
-  
-  let aiAnalysis: AIAnalysis | null = null;
+  let result: DiagnosticResult;
 
   try {
+    // Ask the AI to interpret raw evidence independently.
     const prompt = buildDiagnosisPrompt(
       pod.name,
       namespace,
-      diagnosis,
       {
         pod,
         events,
@@ -49,37 +51,52 @@ async function main() {
     );
 
     const rawResponse = await askAI(prompt);
-
     const parsedAnalysis = parseAIAnalysis(rawResponse);
 
-    aiAnalysis = {
+    // Keep AI-generated commands as suggestions only.
+    const validatedAnalysis: AIAnalysis = {
       ...parsedAnalysis,
       nextChecks: parsedAnalysis.nextChecks.filter(check => {
-        const result = validateDiagnosticCommand(check.command);
+        const validation = validateDiagnosticCommand(check.command);
 
-        if (!result.safe) {
+        if (!validation.safe) {
           console.warn(
             `Blocked AI-recommended command: ${check.command}`,
-            `Reason: ${result.reason}`,
+            `Reason: ${validation.reason}`,
           );
         }
 
-        return result.safe;
+        return validation.safe;
       }),
     };
 
+    result = {
+      source: "ai",
+      analysis: validatedAnalysis,
+    };
   } catch (error) {
-    console.error("AI review failed:", error);
+    console.error(
+      "AI analysis failed; using deterministic fallback:",
+      error,
+    );
+
+    result = {
+      source: "deterministic-fallback",
+      diagnosis: diagnose({
+        pod,
+        events,
+        logs,
+      }),
+    };
   }
 
-
+  // The primary displayed result is the AI analysis when available.
   console.dir(
     {
       pod,
       events,
       logs,
-      diagnosis,
-      aiAnalysis,
+      result,
     },
     {
       depth: null,
