@@ -208,33 +208,52 @@ export function diagnose(
       : undefined
   );
 
-  if (crashLoopContainer) {
-    summary =
-      crashLoopContainer.state?.reason === "CrashLoopBackOff" || backOffEvents.length > 0
-        ? `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`
-        : `Container ${crashLoopContainer.name} has terminated unexpectedly.`;
+    if (crashLoopContainer) {
+    const isCrashLoop =
+      crashLoopContainer.state?.reason === "CrashLoopBackOff" ||
+      backOffEvents.length > 0;
 
-    if (
-      logs.logs &&
-      logs.logs.toLowerCase().includes("crashed")
-    ) {
-      rootCause =
-        `The ${crashLoopContainer.name} container is repeatedly ` +
-        `crashing. The previous container logs indicate that the ` +
-        `application itself crashed, causing Kubernetes to restart it.`;
+    const terminationReason =
+      crashLoopContainer.state?.reason ?? "unknown";
 
-      recommendation =
-        "Inspect the application error immediately before the crash " +
-        "and check the container exit code to determine why the " +
-        "application is terminating.";
+    const exitCode =
+      crashLoopContainer.state?.exitCode ?? "unknown";
+
+    if (isCrashLoop) {
+      summary =
+        `Container ${crashLoopContainer.name} is in CrashLoopBackOff.`;
+
+      if (
+        logs.logs &&
+        logs.logs.toLowerCase().includes("crashed")
+      ) {
+        rootCause =
+          `The ${crashLoopContainer.name} container is repeatedly ` +
+          `crashing. The logs indicate that the application crashed.`;
+
+        recommendation =
+          "Inspect the application error immediately before the crash and check the container exit code.";
+      } else {
+        rootCause =
+          `Kubernetes has reported a restart/backoff signal for ` +
+          `${crashLoopContainer.name}. The available evidence indicates ` +
+          `a container restart problem.`;
+
+        recommendation =
+          "Inspect the previous container logs, termination details, and Kubernetes events to identify the cause.";
+      }
     } else {
-      rootCause =
-        `The ${crashLoopContainer.name} container is repeatedly ` +
-        `terminating and Kubernetes is backing off before restarting it.`;
+      summary =
+        `Container ${crashLoopContainer.name} terminated with an error.`;
+
+      rootCause = logs.logs
+        ? `The container terminated with reason ${terminationReason} ` +
+          `and exit code ${exitCode}. Available logs: ${logs.logs.trim()}`
+        : `The container terminated with reason ${terminationReason} ` +
+          `and exit code ${exitCode}. No container logs are available.`;
 
       recommendation =
-        "Inspect the previous container logs and termination details " +
-        "to determine why the container is exiting.";
+        "Inspect the application logs and exit code to identify why the workload failed. For a Job, also review its status and retry settings.";
     }
   }
 
