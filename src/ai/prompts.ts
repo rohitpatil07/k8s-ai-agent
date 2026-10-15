@@ -58,6 +58,25 @@ INVESTIGATION GUIDELINES
     recommend a suitable discovery command without assuming its
     value.
 
+13. Ensure every suggested diagnostic command actually provides
+    the information described in its reason. Do not claim that a
+    command reveals data that its output does not contain.
+
+    For resource-related investigations:
+    - Use "kubectl describe pod <name> -n <namespace>" to inspect
+      pod details, resource requests, and scheduling events.
+    - Use "kubectl describe nodes" to inspect node capacity,
+      allocatable resources, and allocated resource requests.
+    - Use "kubectl top nodes" to inspect live resource usage when
+      the Kubernetes metrics API is available.
+    - Do not treat current CPU utilization as equivalent to CPU
+      available for scheduling. Kubernetes scheduling decisions
+      account for resource requests and node allocatable capacity.
+
+    Choose commands according to the actual evidence gap. Do not
+    recommend every command merely because it is available.
+
+
 POD
 Name: ${podName}
 Namespace: ${namespace}
