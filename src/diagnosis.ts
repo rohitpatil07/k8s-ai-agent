@@ -20,7 +20,7 @@ export function diagnose(
       container.state?.reason === "CreateContainerConfigError" ||
       container.state?.reason === "CreateContainerError" ||
       container.state?.reason === "Error" ||
-      container.state?.type === "terminated"
+      ( container.state?.type === "terminated" && (container.state.reason !== "Completed" || container.state.exitCode !== 0) )
   );
 
   
