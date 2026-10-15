@@ -123,6 +123,36 @@ export function diagnose(
     };
   }
 
+  
+  const configErrorContainer = pod.containers.find(
+    container =>
+      container.state?.reason === "CreateContainerConfigError" ||
+      container.state?.reason === "CreateContainerError",
+  );
+
+  if (configErrorContainer) {
+    const reason = configErrorContainer.state?.reason;
+    const message = configErrorContainer.state?.message;
+
+    evidence.push(
+      `Container configuration failure for ${configErrorContainer.name}: ` +
+      `reason=${reason}, ` +
+      `message=${message ?? "No detailed message available"}.`,
+    );
+
+    return {
+      summary:
+        `Container ${configErrorContainer.name} cannot be created because of a configuration error.`,
+      rootCause:
+        message ??
+        `Kubernetes reported ${reason}, but the detailed cause was not available.`,
+      evidence,
+      recommendation:
+        "Inspect the pod description and recent events. Verify referenced ConfigMaps, Secrets, environment variables, volumes, and other container configuration.",
+    };
+  }
+
+
 
   let summary = `Pod ${pod.name} requires investigation.`;
   let rootCause = "Unable to determine the root cause.";
