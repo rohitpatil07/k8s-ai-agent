@@ -37,6 +37,7 @@ describe("validateDiagnosticCommand", () => {
       "kubectl delete",
       "kubectl logs",
       "kubectl get pods --invented-flag",
+      "kubectl logs pod crashloop-test",
     ])("rejects: %s", (command) => {
       expect(validateDiagnosticCommand(command).safe).toBe(false);
     });
