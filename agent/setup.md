@@ -27,3 +27,6 @@ kubectl run nginx --image nginx
 # Build and test initial setup
 cd k8s-ai-agent
 npm i -y && npm run build && npm start
+
+# Start the server with k3s config
+KUBECONFIG=/etc/rancher/k3s/k3s.yaml npm run dev:api
