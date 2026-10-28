@@ -36,6 +36,11 @@ export interface PodDetail {
     ready: boolean;
     restartCount: number;
 
+    resources?: {
+      requests: Record<string, string>;
+      limits: Record<string, string>;
+    };
+
     state?: {
       type: "waiting" | "running" | "terminated";
       reason?: string;
@@ -87,4 +92,20 @@ export interface Diagnosis {
   rootCause: string;
   evidence: string[];
   recommendation: string;
+}
+
+export interface NodeResourceSummary {
+  name: string;
+  ready: boolean;
+  unschedulable: boolean;
+  capacity: {
+    cpu?: string;
+    memory?: string;
+    pods?: string;
+  };
+  allocatable: {
+    cpu?: string;
+    memory?: string;
+    pods?: string;
+  };
 }

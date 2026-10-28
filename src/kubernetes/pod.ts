@@ -1,6 +1,16 @@
 import { coreApi } from "./client.js";
 import type { PodDetail } from "./types.js";
 
+function normalizeResourceValues(
+  values: Record<string, unknown> | undefined,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(values ?? {}).map(
+      ([name, value]) => [name, String(value)],
+    ),
+  );
+}
+
 export async function getPod(
   namespace: string,
   podName: string,
@@ -69,6 +79,16 @@ export async function getPod(
       image: container.image,
       ready: status?.ready ?? false,
       restartCount: status?.restartCount ?? 0,
+
+      resources: {
+        requests: normalizeResourceValues(
+          container.resources?.requests,
+        ),
+        limits: normalizeResourceValues(
+          container.resources?.limits,
+        ),
+      },
+
       state: containerState,
       lastState,
     };
