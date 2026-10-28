@@ -1,0 +1,14 @@
+{
+  "name": "k8s-ai-agent-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix agent run dev",
+    "build": "npm --prefix agent run build",
+    "start": "npm --prefix agent run start",
+    "test": "npm --prefix agent run test",
+    "test:unit": "npm --prefix agent run test:unit",
+    "test:integration": "npm --prefix agent run test:integration",
+    "frontend:dev": "npm --prefix frontend run dev"
+  }
+}
