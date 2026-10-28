@@ -23,8 +23,11 @@ export OPENROUTER_API_KEY=
 # clone repo 
 git clone https://github.com/rohitpatil07/k8s-ai-agent.git
 
+# Spin up sample pod
+k run nginx --image nginx
+
 #Build and test initial setup
-cd k8s-ai-agent
+cd k8s-ai-agent/agent
 npm i -y && npm run build && npm start
 
 
