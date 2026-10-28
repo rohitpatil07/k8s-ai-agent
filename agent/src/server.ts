@@ -102,4 +102,3 @@ app.use((req, res) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`Kubernetes AI Agent API listening on port ${port}`);
 });
-EOF
