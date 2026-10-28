@@ -4,13 +4,20 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { registerListPodsTool } from "./tools/list-pods.js";
 
+const registerTools = () => {
+  registerListPodsTool(server);
+  registerGetPodDetailsTool(server);
+}
+
 function createServer(): McpServer {
   const server = new McpServer({
     name: "k8s-ai-agent",
     version: "1.0.0",
   });
 
-  registerListPodsTool(server);
+  console.log("Starting to register tools...");
+  registerTools()
+  console.log("Tools have been registered");
 
   return server;
 }
