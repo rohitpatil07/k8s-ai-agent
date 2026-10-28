@@ -6,6 +6,14 @@ const port = Number.parseInt(process.env.PORT ?? "3000", 10);
 
 app.use(express.json({ limit: "16kb" }));
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "k8s-ai-agent",
+    message: "Agent server is running"
+  });
+});
+
 // Health check: confirms that the HTTP server is running.
 app.get("/health", (req, res) => {
   res.status(200).json({
