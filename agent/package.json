@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:integration": "vitest run tests/integration",
     "test:unit": "vitest run tests/unit",
-    "dev:api": "tsx src/api/server.ts"
+    "dev:api": "tsx src/api/server.ts",
+    "dev:mcp": "tsx src/mcp/server.ts"
   },
   "keywords": [],
   "author": "",
