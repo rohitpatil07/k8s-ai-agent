@@ -14,6 +14,7 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 alias k=kubectl
 alias syncrepo="git pull && npm run dev"
 alias syncbuild="git pull && npm run build"
+alias synctest="git pull && npm run test"
 
 # ai
 export OPENROUTER_MODEL="nvidia/nemotron-3.5-lightning:free"

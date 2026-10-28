@@ -41,4 +41,17 @@ describe("validateDiagnosticCommand", () => {
       expect(validateDiagnosticCommand(command).safe).toBe(false);
     });
   });
+
+  describe("flag values", () => {
+    it.each([
+      { command: "kubectl get pods -o wide", safe: true },
+      { command: "kubectl get pods -o invalid", safe: false },
+      { command: "kubectl logs nginx --tail 100", safe: true },
+      { command: "kubectl logs nginx --tail all", safe: false },
+      { command: "kubectl logs nginx --since 5m", safe: true },
+      { command: "kubectl logs nginx --since yesterday", safe: false },
+    ])("$command", ({ command, safe }) => {
+      expect(validateDiagnosticCommand(command).safe).toBe(safe);
+    });
+  });
 });
