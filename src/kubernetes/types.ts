@@ -93,3 +93,19 @@ export interface Diagnosis {
   evidence: string[];
   recommendation: string;
 }
+
+export interface NodeResourceSummary {
+  name: string;
+  ready: boolean;
+  unschedulable: boolean;
+  capacity: {
+    cpu?: string;
+    memory?: string;
+    pods?: string;
+  };
+  allocatable: {
+    cpu?: string;
+    memory?: string;
+    pods?: string;
+  };
+}
