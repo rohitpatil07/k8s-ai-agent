@@ -36,6 +36,11 @@ export interface PodDetail {
     ready: boolean;
     restartCount: number;
 
+    resources?: {
+      requests: Record<string, string>;
+      limits: Record<string, string>;
+    };
+
     state?: {
       type: "waiting" | "running" | "terminated";
       reason?: string;
