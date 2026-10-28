@@ -236,6 +236,42 @@ export function validateDiagnosticCommand(
     }
   }
 
+  // kubectl logs accepts one positional target.
+  // Ignore approved flags and their values when counting targets.
+  if (parts[1] === "logs") {
+    const positionalArgs: string[] = [];
+
+    for (let i = 2; i < parts.length; i++) {
+      const token = parts[i];
+
+      if (token.startsWith("-")) {
+        const equalsIndex = token.indexOf("=");
+        const flag =
+          equalsIndex >= 0
+            ? token.slice(0, equalsIndex)
+            : token;
+
+        if (
+          FLAGS_WITH_VALUES.has(flag) &&
+          equalsIndex === -1
+        ) {
+          i++;
+        }
+
+        continue;
+      }
+
+      positionalArgs.push(token);
+    }
+
+    if (positionalArgs.length !== 1) {
+      return {
+        safe: false,
+        reason: "kubectl logs requires exactly one positional target.",
+      };
+    }
+  }
+
 
   return {
     safe: true,
