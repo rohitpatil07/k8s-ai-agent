@@ -1,5 +1,5 @@
 import express from "express";
-import { troubleshootPod } from "./agent.js";
+import { troubleshootPod } from "../core/agent.js";
 
 const app = express();
 const port = Number.parseInt(process.env.PORT ?? "3000", 10);

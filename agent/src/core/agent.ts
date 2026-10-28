@@ -1,15 +1,15 @@
 
-import { getPod } from "./kubernetes/pod.js";
-import { getPodEvents } from "./kubernetes/events.js";
-import { getPodLogs } from "./kubernetes/logs.js";
+import { getPod } from "../kubernetes/pod.js";
+import { getPodEvents } from "../kubernetes/events.js";
+import { getPodLogs } from "../kubernetes/logs.js";
 import { diagnose } from "./diagnosis.js";
 import {
   askAI,
   parseAIAnalysis,
-} from "./ai/openrouter.js";
-import { buildDiagnosisPrompt } from "./ai/prompts.js";
-import { validateDiagnosticCommand } from "./ai/command-safety.js";
-import type { AIAnalysis } from "./ai/types.js";
+} from "../ai/openrouter.js";
+import { buildDiagnosisPrompt } from "../ai/prompts.js";
+import { validateDiagnosticCommand } from "../ai/command-safety.js";
+import type { AIAnalysis } from "../ai/types.js";
 
 export interface AgentRequest {
   namespace: string;
