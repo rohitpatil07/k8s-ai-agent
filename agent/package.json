@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "@kubernetes/client-node": "^2.0.0",
-    "express": "^5.3.0"
+    "@modelcontextprotocol/server": "^2.4.0",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
   }
 }
