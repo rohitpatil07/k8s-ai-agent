@@ -153,7 +153,7 @@ describe.skipIf(!process.env.OPENROUTER_API_KEY)(
   () => {
     it.each(scenarios)(
       "$name",
-      async ({ scenario }) => {
+      async ( scenario ) => {
          const { evidence, expected } = scenario;
         const prompt = buildDiagnosisPrompt(
           evidence.pod.name,
