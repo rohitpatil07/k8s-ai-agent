@@ -4,7 +4,7 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { registerListPodsTool } from "./tools/list-pods.js";
 
-const registerTools = () => {
+const registerTools = (server) => {
   registerListPodsTool(server);
   registerGetPodDetailsTool(server);
 }
@@ -16,7 +16,7 @@ function createServer(): McpServer {
   });
 
   console.log("Starting to register tools...");
-  registerTools()
+  registerTools(server)
   console.log("Tools have been registered");
 
   return server;
