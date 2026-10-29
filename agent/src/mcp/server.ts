@@ -4,10 +4,12 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { registerListPodsTool } from "./tools/list-pods.js";
 import { registerGetPodDetailsTool } from "./tools/get-pod-details.js";
+import { registerGetPodEventsTool } from "./tools/get-pod-events.js";
 
 const registerTools = (server: McpServer) => {
   registerListPodsTool(server);
   registerGetPodDetailsTool(server);
+  registerGetPodEventsTool(server);
 }
 
 function createServer(): McpServer {
