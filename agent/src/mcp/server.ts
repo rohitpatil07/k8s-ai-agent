@@ -4,7 +4,7 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { registerListPodsTool } from "./tools/list-pods.js";
 
-const registerTools = (server) => {
+const registerTools = (server: McpServer) => {
   registerListPodsTool(server);
   registerGetPodDetailsTool(server);
 }
