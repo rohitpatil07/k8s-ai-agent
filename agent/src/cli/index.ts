@@ -1,5 +1,5 @@
 
-import { troubleshootPod } from "./agent.js";
+import { troubleshootPod } from "../core/agent.js";
 
 const namespace = process.argv[2] ?? "default";
 const podName = process.argv[3] ?? "nginx";

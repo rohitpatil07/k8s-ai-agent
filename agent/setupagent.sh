@@ -12,6 +12,7 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 # export alias
 alias k=kubectl
+alias sync="git pull"
 alias syncrepo="git pull && npm run dev"
 alias syncbuild="git pull && npm run build"
 alias synctest="git pull && npm run test"
@@ -23,8 +24,11 @@ export OPENROUTER_API_KEY=
 # clone repo 
 git clone https://github.com/rohitpatil07/k8s-ai-agent.git
 
+# Spin up sample pod
+k run nginx --image nginx
+
 #Build and test initial setup
-cd k8s-ai-agent
+cd k8s-ai-agent/agent
 npm i -y && npm run build && npm start
 
 

@@ -1,29 +1,14 @@
 {
-  "name": "k8s-ai-agent",
+  "name": "k8s-ai-agent-project",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "vitest run",
-    "test:integration": "vitest run tests/integration",
-    "test:unit": "vitest run tests/unit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.2.0",
-    "tsx": "^4.23.12",
-    "typescript": "^7.0.2",
-    "vitest": "^5.0.5"
-  },
-  "dependencies": {
-    "@kubernetes/client-node": "^2.0.0",
-    "express": "^5.3.0"
+    "dev": "npm --prefix agent run dev",
+    "build": "npm --prefix agent run build",
+    "start": "npm --prefix agent run start",
+    "test": "npm --prefix agent run test",
+    "test:unit": "npm --prefix agent run test:unit",
+    "test:integration": "npm --prefix agent run test:integration",
+    "frontend:dev": "npm --prefix frontend run dev"
   }
 }

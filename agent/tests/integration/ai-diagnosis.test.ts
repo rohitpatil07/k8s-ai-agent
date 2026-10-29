@@ -5,13 +5,6 @@ import { buildDiagnosisPrompt } from "../../src/ai/prompts.js";
 import type { CollectedEvidence } from "../../src/ai/types.js";
 import type { Scenario } from "../types.js"
 
-// interface Scenario {
-//   name: string;
-//   evidence: CollectedEvidence;
-//   expected: RegExp[];
-//   expectedCheck?: boolean;
-// }
-
 const scenarios: Scenario[] = [
   {
     name: "Healthy pod",
