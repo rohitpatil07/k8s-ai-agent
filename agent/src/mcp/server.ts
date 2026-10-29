@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { registerListPodsTool } from "./tools/list-pods.js";
+import { registerGetPodDetailsTool } from "./tools/get-pod-details.js";
 
 const registerTools = (server: McpServer) => {
   registerListPodsTool(server);
