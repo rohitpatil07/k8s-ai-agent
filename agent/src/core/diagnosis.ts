@@ -1,7 +1,7 @@
 import type {
   DiagnosticContext,
   Diagnosis,
-} from "./kubernetes/types.js";
+} from "../kubernetes/types.js";
 
 export function diagnose(
   context: DiagnosticContext,
