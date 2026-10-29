@@ -22,9 +22,9 @@ function createServer(): McpServer {
     version: "1.0.0",
   });
 
-  console.log("Starting to register tools...");
+  // console.log("Starting to register tools...");
   registerTools(server)
-  console.log("Tools have been registered");
+  // console.log("Tools have been registered");
 
   return server;
 }
