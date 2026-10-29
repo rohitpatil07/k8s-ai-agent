@@ -6,12 +6,14 @@ import { registerListPodsTool } from "./tools/list-pods.js";
 import { registerGetPodDetailsTool } from "./tools/get-pod-details.js";
 import { registerGetPodEventsTool } from "./tools/get-pod-events.js";
 import { registerGetPodLogsTool } from "./tools/get-pod-logs.js";
+import { registerGetNodeResourcesTool } from "./tools/get-node-resources.js";
 
 const registerTools = (server: McpServer) => {
   registerListPodsTool(server);
   registerGetPodDetailsTool(server);
   registerGetPodEventsTool(server);
   registerGetPodLogsTool(server);
+  registerGetNodeResourcesTool(server);
 }
 
 function createServer(): McpServer {
