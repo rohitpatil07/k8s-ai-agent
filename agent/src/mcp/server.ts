@@ -29,8 +29,6 @@ function createServer(): McpServer {
   return server;
 }
 
-console.error("Starting Kubernetes AI Agent MCP server...");
-
 serveStdio(createServer, {
   onerror: error => {
     console.error("MCP server error:", error);
