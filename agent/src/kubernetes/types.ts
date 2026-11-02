@@ -29,6 +29,7 @@ export interface PodDetail {
 
   node?: string;
   podIP?: string;
+  restartPolicy?: PodRestartPolicy;
 
   containers: {
     name: string;
@@ -109,3 +110,8 @@ export interface NodeResourceSummary {
     pods?: string;
   };
 }
+
+export type PodRestartPolicy =
+  | "Always"
+  | "OnFailure"
+  | "Never";

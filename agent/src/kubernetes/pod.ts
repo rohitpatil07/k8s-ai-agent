@@ -1,5 +1,5 @@
 import { coreApi } from "./client.js";
-import type { PodDetail } from "./types.js";
+import type { PodDetail, PodRestartPolicy } from "./types.js";
 
 function normalizeResourceValues(
   values: Record<string, unknown> | undefined,
@@ -9,6 +9,20 @@ function normalizeResourceValues(
       ([name, value]) => [name, String(value)],
     ),
   );
+}
+
+function normalizeRestartPolicy(
+  value: string | undefined,
+): PodRestartPolicy | undefined {
+  if (
+    value === "Always" ||
+    value === "OnFailure" ||
+    value === "Never"
+  ) {
+    return value;
+  }
+
+  return undefined;
 }
 
 export async function getPod(
@@ -98,6 +112,9 @@ export async function getPod(
     name: pod.metadata?.name ?? podName,
     namespace: pod.metadata?.namespace ?? namespace,
     phase: pod.status?.phase,
+    restartPolicy: normalizeRestartPolicy(
+      pod.spec?.restartPolicy,
+    ),
     node: pod.spec?.nodeName,
     podIP: pod.status?.podIP,
     containers,
