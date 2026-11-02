@@ -9,15 +9,22 @@ import {
   mcpToolset,
 } from "./agent.js";
 
-const prompt = `Get detailed information about busypod in the default namespace.
-Explain:
-1. Pod phase.
-2. Restart policy.
-3. Current container state and termination reason.
-4. Exit code.
-5. Readiness and restart count.
-Explain why a container that exits successfully might still restart.
-Distinguish Pod phase from container state.`;
+const prompt = `Investigate why busypod is repeatedly restarting
+in the default namespace.
+
+Inspect its pod details, Kubernetes events,
+and available container logs.
+
+Correlate the evidence to explain:
+1. What is happening?
+2. Why is it happening?
+3. What evidence supports the diagnosis?
+4. What remains uncertain?
+5. What should be investigated next?
+
+Clearly distinguish observed facts from hypotheses.
+Do not assume the restart policy alone explains
+the application's intended behaviour.`;
 // const prompt = "List the pods in the default namespace and summarize their health.";
 
 // const prompt = "List the pods in the default namespace. For each pod, report its name, status, readiness, restart count, and node. Base your answer on the Kubernetes tools rather than assumptions"; 
