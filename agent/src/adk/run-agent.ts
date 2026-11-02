@@ -9,7 +9,9 @@ import {
   mcpToolset,
 } from "./agent.js";
 
-const prompt = "List the pods in the default namespace. For each pod, report its name, status, readiness, restart count, and node. Base your answer on the Kubernetes tools rather than assumptions"; 
+const prompt = "List the pods in the default namespace and summarize their health.";
+
+// const prompt = "List the pods in the default namespace. For each pod, report its name, status, readiness, restart count, and node. Base your answer on the Kubernetes tools rather than assumptions"; 
 
 // const prompt =
 //   process.argv.slice(2).join(" ") ||
