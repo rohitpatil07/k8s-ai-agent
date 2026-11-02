@@ -9,7 +9,16 @@ import {
   mcpToolset,
 } from "./agent.js";
 
-const prompt = "List the pods in the default namespace and summarize their health.";
+const prompt = `Get detailed information about busypod in the default namespace.
+Explain:
+1. Pod phase.
+2. Restart policy.
+3. Current container state and termination reason.
+4. Exit code.
+5. Readiness and restart count.
+Explain why a container that exits successfully might still restart.
+Distinguish Pod phase from container state.`;
+// const prompt = "List the pods in the default namespace and summarize their health.";
 
 // const prompt = "List the pods in the default namespace. For each pod, report its name, status, readiness, restart count, and node. Base your answer on the Kubernetes tools rather than assumptions"; 
 
